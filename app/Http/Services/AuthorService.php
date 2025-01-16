@@ -18,28 +18,53 @@ class AuthorService
 
     public function index()
     {
-        return new AuthorCollection($this->authorRepository->index());
+        return new AuthorCollection($this->authorRepository->paginate());
     }
 
     public function store($request)
     {
-        $data = $request->validated();
-        return $this->authorRepository->store($data);
+        try
+        {
+            $data = $request->validated();
+            $this->authorRepository->create($data);
+            return response()->json(['message' => 'author is saved'], 201);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($e->getMessage(), 400);
+        }
     }
 
     public function show($id)
     {
-        return new AuthorResource($this->authorRepository->show($id));
+        return new AuthorResource($this->authorRepository->find($id));
     }
 
-    public function update($request, $id)
+    public function update($id,$request)
     {
-        $data = $request->validated();
-        return $this->authorRepository->update($data,$id);
+        try
+        {
+            $data = $request->validated();
+            $this->authorRepository->update($id,$data);
+            return response()->json(['message' => 'author is updated'], 200);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($e->getMessage(), 400);
+        }
     }
 
     public function destroy($id)
     {
-        return $this->authorRepository->destroy($id);
+        try
+        {
+            $this->authorRepository->delete($id);
+            return response()->json(['message' => 'author is deleted'], 200);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($e->getMessage(), 400);
+        }
+
     }
 }

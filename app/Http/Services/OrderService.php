@@ -32,7 +32,7 @@ class OrderService
             $total_price = 0;
             $data['total_price'] = $total_price;
             $data['user_id'] = auth()->user()->id;
-            $order = $this->orderRepository->store($data);
+            $order = $this->orderRepository->create($data);
             foreach($request->books as $book)
             {
                 $oldbook = $this->BookRepository->find($book['book_id']);
@@ -48,8 +48,8 @@ class OrderService
                 {
                     return response()->json(['message' => 'Not enough quantity of book'], 400);
                 }
-                $orderBook = $this->orderBookRepository->store($data2);
-                $this->BookRepository->update(['stock' => $oldbook->stock - $book['quantity']],$oldbook->id);
+                $orderBook = $this->orderBookRepository->create($data2);
+                $this->BookRepository->update($oldbook->id,['stock' => $oldbook->stock - $book['quantity']]);
             }
             $this->orderRepository->update($order->id, ['total_price' => $total_price]);
             DB::commit();
@@ -62,4 +62,18 @@ class OrderService
         }
     }
 
+    public function changeStatus($id,$request)
+    {
+        try
+        {
+            $order = $this->orderRepository->find($id);
+            $this->orderRepository->update($id, ['status' => $request->status]);
+            return response()->json(['message' => 'order is updated'], 200);
+        }
+        catch (Exception $e)
+        {
+            DB::rollBack();
+            return response()->json($e->getMessage(), 400);
+        }
+    }
 }

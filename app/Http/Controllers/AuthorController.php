@@ -28,9 +28,9 @@ class AuthorController extends Controller
         return $this->author->show($id);
     }
 
-    public function update(AuthorRequest $request,$id)
+    public function update($id,AuthorRequest $request)
     {
-        return $this->author->update($request,$id);
+        return $this->author->update($id,$request);
     }
 
     public function destroy($id)

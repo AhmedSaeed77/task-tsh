@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests\OrderRequest;
+use App\Http\Requests\StatusRequest;
 use App\Http\Services\OrderService;
 
 class OrderController extends Controller
@@ -21,6 +22,11 @@ class OrderController extends Controller
     public function store(OrderRequest $request)
     {
         return $this->order->store($request);
+    }
+
+    public function changeStatus($id,StatusRequest $request)
+    {
+        return $this->order->changeStatus($id,$request);
     }
 
 }

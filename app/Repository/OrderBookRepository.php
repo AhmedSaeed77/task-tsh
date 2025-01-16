@@ -2,19 +2,17 @@
 
 namespace App\Repository;
 use App\Models\OrderBook;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class OrderBookRepository implements OrderBookRepositoryInterface
+class OrderBookRepository extends Repository implements OrderBookRepositoryInterface
 {
 
-    public function __construct(private readonly OrderBook $model)
-    {
+    protected Model $model;
 
-    }
-
-    public function store($request)
+    public function __construct(OrderBook $model)
     {
-        return $this->model->create($request);
+        parent::__construct($model);
     }
 
 }

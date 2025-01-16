@@ -1,17 +1,16 @@
 <?php
 
 namespace App\Repository;
-use App\Models\Category;
+use App\Models\Admin;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class CatgoryRepository extends Repository implements CategoryRepositoryInterface
+class AdminRepository extends Repository implements AdminRepositoryInterface
 {
     protected Model $model;
 
-    public function __construct(Category $model)
+    public function __construct(Admin $model)
     {
         parent::__construct($model);
     }
-
 }

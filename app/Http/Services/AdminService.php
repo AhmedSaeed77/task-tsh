@@ -2,7 +2,7 @@
 
 namespace App\Http\Services;
 
-use App\Repository\UserRepositoryInterface;
+use App\Repository\AdminRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 use App\Http\Helpers\Http;
 use Illuminate\Http\Request;
@@ -10,47 +10,46 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
-class UserService
+class AdminService
 {
     public function __construct(
-        private readonly UserRepositoryInterface  $userRepository,
+        private readonly AdminRepositoryInterface  $adminRepository,
     )
     {
     }
 
     public function register($request)
     {
-        $user = $this->userRepository->get('email', $request->email);
-        if ($user) {
+        $admin = $this->adminRepository->get('email', $request->email);
+        if ($admin) {
             throw ValidationException::withMessages([
                 'email' => ['The provided email is already registered.'],
             ]);
         }
         $data = $request->except('password');
         $data['password'] = Hash::make($request->password);
-        $user = $this->userRepository->create($data);
-        $token = $user->createToken('auth_token')->accessToken;
-        return response()->json(['user' => $user,'token' => $token], 201);
+        $admin = $this->adminRepository->create($data);
+        $token = $admin->createToken('auth_token')->accessToken;
+        return response()->json(['admin' => $admin,'token' => $token], 201);
     }
 
     public function login($request)
     {
         $request->validated();
-        if (!Auth::attempt($request->only('email', 'password')))
-        {
+        $admin = $this->adminRepository->get('email', $request->email);
+        if (!$admin || !Hash::check($request->password, $admin->password)) {
             throw ValidationException::withMessages([
                 'credentials' => ['The provided credentials are incorrect.'],
             ]);
         }
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->accessToken;
-
-        return response()->json(['user' => $user,'token' => $token], 200);
+        $token = $admin->createToken('auth_token')->accessToken;
+        return response()->json(['admin' => $admin, 'token' => $token], 200);
     }
 
     public function logout($request)
     {
-        $request->user()->token()->revoke();
-        return response()->json(['message' => 'Successfully logged out']);
+        $token = $request->user('admin')->token();
+        $token->revoke();
+        return response()->json(['message' => 'Successfully logged out'], 200);
     }
 }

@@ -17,17 +17,34 @@ class CategoryService
 
     public function index()
     {
-        return new CategoryCollection($this->categoryRepository->index());
+        return new CategoryCollection($this->categoryRepository->paginate());
     }
 
     public function store($request)
     {
-        $data = $request->validated();
-        return $this->categoryRepository->store($data);
+        try
+        {
+            $data = $request->validated();
+            $this->categoryRepository->create($data);
+            return response()->json(['message' => 'category is saved'], 201);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($e->getMessage(), 400);
+        }
     }
 
     public function destroy($id)
     {
-        return $this->categoryRepository->destroy($id);
+        try
+        {
+            $this->categoryRepository->delete($id);
+            return response()->json(['message' => 'category is deleted'], 200);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($e->getMessage(), 400);
+        }
+
     }
 }

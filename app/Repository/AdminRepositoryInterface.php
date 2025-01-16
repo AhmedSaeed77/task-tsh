@@ -2,6 +2,6 @@
 
 namespace App\Repository;
 
-interface CategoryRepositoryInterface
+interface AdminRepositoryInterface
 {
 }

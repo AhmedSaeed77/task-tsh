@@ -2,17 +2,20 @@
 
 namespace App\Repository;
 use App\Models\Book;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class BookRepository implements BookRepositoryInterface
+class BookRepository extends Repository implements BookRepositoryInterface
 {
 
-    public function __construct(private readonly Book $model)
-    {
+    protected Model $model;
 
+    public function __construct(Book $model)
+    {
+        parent::__construct($model);
     }
 
-    public function index()
+    public function getAllBooks()
     {
         return $this->model::query()
                 ->when(request()->has('title') && request('title') != null, function ($query) {
@@ -30,56 +33,6 @@ class BookRepository implements BookRepositoryInterface
                     });
                 })
                 ->paginate(request('perPage'));
-    }
-
-    public function store($request)
-    {
-        try
-        {
-            $this->model->create($request);
-            return response()->json(['message' => 'book is saved'], 200);
-        }
-        catch (\Exception $e)
-        {
-            return response()->json($e->getMessage(), 400);
-        }
-    }
-
-    public function show($id)
-    {
-        return $this->model::find($id);
-    }
-
-    public function update($request,$id)
-    {
-        try
-        {
-            $author = $this->model::find($id);
-            $author->update($request);
-            return response()->json(['message' => 'book is updated'], 200);
-        }
-        catch (\Exception $e)
-        {
-            return response()->json($e->getMessage(), 400);
-        }
-    }
-
-    public function destroy($id)
-    {
-        try
-        {
-            $this->model->find($id)->delete();
-            return response()->json(['message' => 'book is deleted'], 200);
-        }
-        catch (\Exception $e)
-        {
-            return response()->json($e->getMessage(), 400);
-        }
-    }
-
-    public function find($id)
-    {
-        return $this->model::find($id);
     }
 
 }

@@ -2,25 +2,16 @@
 
 namespace App\Repository;
 use App\Models\Order;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
-class OrderRepository implements OrderRepositoryInterface
+class OrderRepository extends Repository implements OrderRepositoryInterface
 {
+    protected Model $model;
 
-    public function __construct(private readonly Order $model)
+    public function __construct(Order $model)
     {
-
-    }
-
-    public function store($request)
-    {
-        return $this->model->create($request);
-    }
-
-    public function update($id,$request)
-    {
-        $order = $this->model::find($id);
-        $order->update($request);
+        parent::__construct($model);
     }
 
     public function getAllOrdersForUser($id)

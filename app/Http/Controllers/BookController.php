@@ -28,9 +28,9 @@ class BookController extends Controller
         return $this->book->show($id);
     }
 
-    public function update(BookRequest $request,$id)
+    public function update($id,BookRequest $request)
     {
-        return $this->book->update($request,$id);
+        return $this->book->update($id,$request);
     }
 
     public function destroy($id)

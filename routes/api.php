@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\AuthorController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\AuthAdminController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,20 +20,25 @@ use App\Http\Controllers\OrderController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
 
+Route::post('/admin/register', [AuthAdminController::class, 'register']);
+Route::post('/admin/login', [AuthAdminController::class, 'login']);
+Route::post('/admin/logout', [AuthAdminController::class, 'logout'])->middleware('auth:admin');
+
+Route::middleware('auth:admin')->group(function () {
+    Route::apiResource('categories', CategoryController::class)->except(['show', 'update']);
+    Route::apiResource('authors', AuthorController::class);
+    Route::apiResource('books', BookController::class);
+    Route::post('/order/{id}/status', [OrderController::class, 'changeStatus']);
+});
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:api');
 
+Route::middleware('auth:api')->group(function () {
+    Route::post('/order', [OrderController::class, 'store'])->middleware('auth:api');
+    Route::get('/getAllOrdersForUser', [OrderController::class, 'getAllOrdersForUser'])->middleware('auth:api');
+});
 
-Route::post('/order', [OrderController::class, 'store'])->middleware('auth:api');
-Route::get('/getAllOrdersForUser', [OrderController::class, 'getAllOrdersForUser'])->middleware('auth:api');
-
-Route::apiResource('categories', CategoryController::class)->except(['show', 'update']);
-Route::apiResource('authors', AuthorController::class);
-Route::apiResource('books', BookController::class);
 

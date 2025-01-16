@@ -18,28 +18,52 @@ class BookService
 
     public function index()
     {
-        return new BookCollection($this->bookRepository->index());
+        return new BookCollection($this->bookRepository->getAllBooks());
     }
 
     public function store($request)
     {
-        $data = $request->validated();
-        return $this->bookRepository->store($data);
+        try
+        {
+            $data = $request->validated();
+            $this->bookRepository->create($data);
+            return response()->json(['message' => 'book is saved'], 201);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($e->getMessage(), 400);
+        }
     }
 
     public function show($id)
     {
-        return new BookResource($this->bookRepository->show($id));
+        return new BookResource($this->bookRepository->find($id));
     }
 
-    public function update($request, $id)
+    public function update($id,$request)
     {
-        $data = $request->validated();
-        return $this->bookRepository->update($data,$id);
+        try
+        {
+            $data = $request->validated();
+            $this->bookRepository->update($id,$data);
+            return response()->json(['message' => 'book is updated'], 200);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($e->getMessage(), 400);
+        }
     }
 
     public function destroy($id)
     {
-        return $this->bookRepository->destroy($id);
+        try
+        {
+            $this->bookRepository->delete($id);
+            return response()->json(['message' => 'book is deleted'], 200);
+        }
+        catch (\Exception $e)
+        {
+            return response()->json($e->getMessage(), 400);
+        }
     }
 }
